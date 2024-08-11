@@ -1,61 +1,43 @@
-import { Sprite } from "pixi.js";
+import type { Ball } from "./Ball";
+import LivesHandler from "../../lifes/LifesHandler";
+import {
+  getCanvasCollisions,
+  getSpritesCollisions,
+} from "../../helpers/collision";
+import App from "../../app/App";
+import { PlatformRenderer } from "../../platform/PlatformRenderer";
 
 export default class BallCollision {
-  private sprite: Sprite;
+  constructor(private sprite: Ball) {}
 
-  constructor(sprite: Sprite) {
-    this.sprite = sprite;
+  checkCollisions() {
+    this.checkCanvasCollision();
+    this.checkPlatformCollision();
   }
 
-  checkCanvasCollision(canvas: HTMLCanvasElement) {
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
+  private checkCanvasCollision() {
+    const { width, height } = App.getCanvas();
+    const { width: spriteWidth, height: spriteHeight, movement } = this.sprite;
+    const { left, right, top, bottom } = getCanvasCollisions(this.sprite);
 
-    this.checkHorizontalCollision(canvasWidth);
-    this.checkVerticalCollision(canvasHeight);
-  }
+    if (left || right) {
+      this.sprite.x = left ? 0 : width - spriteWidth;
+      movement.reverseHorizontalDirection();
+    }
 
-  private checkHorizontalCollision(canvasWidth: number) {
-    if (this.sprite.x < 0) {
-      this.sprite.x = 0;
-      this.reverseHorizontalDirection();
-    } else if (this.sprite.x + this.sprite.width > canvasWidth) {
-      this.sprite.x = canvasWidth - this.sprite.width;
-      this.reverseHorizontalDirection();
+    if (top || bottom) {
+      this.sprite.y = top ? 0 : height - spriteHeight;
+      if (bottom) LivesHandler.removeLife();
+      movement.reverseVerticalDirection();
     }
   }
 
-  private checkVerticalCollision(canvasHeight: number) {
-    if (this.sprite.y < 0) {
-      this.sprite.y = 0;
-      this.reverseVerticalDirection();
-    } else if (this.sprite.y + this.sprite.height > canvasHeight) {
-      this.sprite.y = canvasHeight - this.sprite.height;
-      this.reverseVerticalDirection();
+  private checkPlatformCollision() {
+    if (getSpritesCollisions(this.sprite, PlatformRenderer.sprite) === "top") {
+      const { height: spriteHeight, movement } = this.sprite;
+
+      this.sprite.y = PlatformRenderer.sprite.y - spriteHeight;
+      movement.reverseVerticalDirection();
     }
-  }
-
-  checkPlatformCollision(platformSprite: Sprite): boolean {
-    return BallCollision.testForAABB(this.sprite, platformSprite);
-  }
-
-  private reverseVerticalDirection() {
-    this.sprite["movement"].reverseVerticalDirection()
-  }
-
-  private reverseHorizontalDirection() {
-    this.sprite["movement"].reverseHorizontalDirection();
-  }
-
-  static testForAABB(ball: Sprite, platform: Sprite): boolean {
-    const ballBounds = ball.getBounds();
-    const platformBounds = platform.getBounds();
-
-    return (
-      ballBounds.x < platformBounds.x + platformBounds.width &&
-      ballBounds.x + ballBounds.width > platformBounds.x &&
-      ballBounds.y < platformBounds.y + platformBounds.height &&
-      ballBounds.y + ballBounds.height > platformBounds.y
-    );
   }
 }

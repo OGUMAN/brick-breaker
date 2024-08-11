@@ -1,42 +1,39 @@
-import { Sprite } from "pixi.js";
 import App from "@/modules/game/app/App";
 import TickerHandler from "../ticker/TickerHandler";
+import { getCanvasCollisions } from "../helpers/collision";
+import { PlatformRenderer } from "./PlatformRenderer";
+import platformConfig from "./config";
 
 export class PlatformMovement {
-  private sprite: Sprite;
-  private speed: number;
-  private isMovingLeft: boolean = false;
-  private isMovingRight: boolean = false;
+  private static isMovingLeft: boolean = false;
+  private static isMovingRight: boolean = false;
 
-  constructor(sprite: Sprite, speed: number) {
-    this.sprite = sprite;
-    this.speed = speed;
-  }
-
-  setMovingLeft(isMoving: boolean) {
+  static setMovingLeft(isMoving: boolean) {
     this.isMovingLeft = isMoving;
   }
 
-  setMovingRight(isMoving: boolean) {
+  static setMovingRight(isMoving: boolean) {
     this.isMovingRight = isMoving;
   }
 
-  updatePosition() {
+  static updatePosition() {
     if (this.isMovingLeft) {
-      this.sprite.x -= this.speed * TickerHandler.delta;
+      PlatformRenderer.sprite.x -= platformConfig.speed * TickerHandler.delta;
     } else if (this.isMovingRight) {
-      this.sprite.x += this.speed * TickerHandler.delta;
+      PlatformRenderer.sprite.x += platformConfig.speed * TickerHandler.delta;
     }
 
     this.checkCanvasCollision();
   }
 
-  private checkCanvasCollision() {
-    const canvas = App.app.canvas as HTMLCanvasElement;
-    if (this.sprite.x < 0) {
-      this.sprite.x = 0;
-    } else if (this.sprite.x + this.sprite.width > canvas.width) {
-      this.sprite.x = canvas.width - this.sprite.width;
+  private static checkCanvasCollision() {
+    const canvas = App.app.canvas;
+    const collisions = getCanvasCollisions(PlatformRenderer.sprite);
+
+    if (collisions.left) {
+      PlatformRenderer.sprite.x = 0;
+    } else if (collisions.right) {
+      PlatformRenderer.sprite.x = canvas.width - platformConfig.width;
     }
   }
 }

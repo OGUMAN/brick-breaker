@@ -1,18 +1,19 @@
 import { Sprite } from "pixi.js";
 import TickerHandler from "../../ticker/TickerHandler";
+import ballConfig from "./config";
 
 export default class BallMovement {
-  private speed: number;
-  private direction: number;
+  private direction: number; // Angle in radians
 
-  constructor(speed: number, direction: number) {
-    this.speed = speed;
-    this.direction = direction;
+  constructor() {
+    this.direction = Math.random() * 2 * Math.PI; // Random initial direction
   }
 
   updatePosition(sprite: Sprite) {
-    sprite.x += this.speed * Math.cos(this.direction) * TickerHandler.delta;
-    sprite.y += this.speed * Math.sin(this.direction) * TickerHandler.delta;
+    sprite.x +=
+      ballConfig.speed * Math.cos(this.direction) * TickerHandler.delta;
+    sprite.y +=
+      ballConfig.speed * Math.sin(this.direction) * TickerHandler.delta;
   }
 
   reverseVerticalDirection() {

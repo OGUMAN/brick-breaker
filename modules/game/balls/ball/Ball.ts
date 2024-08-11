@@ -1,55 +1,52 @@
 import { Sprite, Graphics } from "pixi.js";
-import CollisionDetector from "./BallCollision";
+import BallCollision from "./BallCollision";
 import BallMovement from "./BallMovement";
-import Platform from "../../platform/Platform";
 import App from "../../app/App";
+import platformConfig from "../../platform/config";
+import ballConfig from "./config";
 
 export class Ball extends Sprite {
-  private radius: number;
-  private movement: BallMovement;
-  private collisionDetector: CollisionDetector;
+  private isAnimating = false;
+  public movement = new BallMovement();
+  private ballCollision = new BallCollision(this);
+  private static radius = 7;
 
-  constructor(
-    radius: number = 7,
-    color: number = 0x000000,
-    speed: number = 12,
-    direction: number = Math.PI / 6
-  ) {
-    super(Ball.createTexture(radius, color));
-
-    this.radius = radius;
-    this.movement = new BallMovement(speed, direction);
-    this.collisionDetector = new CollisionDetector(this);
-
+  constructor() {
+    super(Ball.createTexture());
     this.setInitialPosition();
   }
 
-  private static createTexture(radius: number, color: number) {
+  private static createTexture() {
     const graphics = new Graphics()
-      .beginFill(color)
-      .drawCircle(0, 0, radius)
-      .endFill();
+      .circle(0, 0, this.radius)
+      .fill(ballConfig.color);
     return App.app.renderer.generateTexture(graphics);
   }
 
   private setInitialPosition() {
-    this.x = this.radius;
-    this.y = this.radius;
+    const { width, height } = App.app.canvas;
+    this.x = (width - Ball.radius) / 2;
+    this.y = height - platformConfig.height * 2 - Ball.radius;
   }
 
   updatePosition() {
     this.movement.updatePosition(this);
-    this.checkPlatformCollision();
+    this.ballCollision.checkCollisions();
   }
 
-  checkCanvasCollision(canvas: HTMLCanvasElement) {
-    this.collisionDetector.checkCanvasCollision(canvas);
-  }
+  public playRespawnAnimation() {
+    if (this.isAnimating) return;
 
-  private checkPlatformCollision() {
-    if (this.collisionDetector.checkPlatformCollision(Platform.getSprite())) {
-      this.movement.reverseVerticalDirection();
-      this.y = Platform.getSprite().y - this.height; // Prevent sticking to the platform
-    }
+    this.isAnimating = true;
+    const flicker = (count = 0) => {
+      this.alpha = 1 - this.alpha; // toggles between 0 and 1
+      if (count < 9) setTimeout(() => flicker(count + 1), 100);
+      else {
+        this.alpha = 1;
+        this.isAnimating = false;
+      }
+    };
+
+    flicker();
   }
 }
