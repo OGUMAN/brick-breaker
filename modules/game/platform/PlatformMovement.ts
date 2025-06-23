@@ -1,6 +1,6 @@
-import App from "@/modules/game/app/App";
+import Game from "~/modules/game/app/Game";
 import TickerHandler from "../ticker/TickerHandler";
-import { getCanvasCollisions } from "../helpers/collision";
+import { CollisionSide, getCanvasCollision } from "../helpers/collision/collision";
 import { PlatformRenderer } from "./PlatformRenderer";
 import platformConfig from "./config";
 
@@ -27,12 +27,14 @@ export class PlatformMovement {
   }
 
   private static checkCanvasCollision() {
-    const canvas = App.app.canvas;
-    const collisions = getCanvasCollisions(PlatformRenderer.sprite);
+    const canvas = Game.app.canvas;
+    const collisionSide = getCanvasCollision(
+      PlatformRenderer.sprite.getBounds()
+    );
 
-    if (collisions.left) {
+    if (collisionSide === CollisionSide.LEFT) {
       PlatformRenderer.sprite.x = 0;
-    } else if (collisions.right) {
+    } else if (collisionSide === CollisionSide.RIGHT) {
       PlatformRenderer.sprite.x = canvas.width - platformConfig.width;
     }
   }

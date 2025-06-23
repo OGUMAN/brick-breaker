@@ -6,7 +6,7 @@ export default class BallMovement {
   private direction: number; // Angle in radians
 
   constructor() {
-    this.direction = Math.random() * 2 * Math.PI; // Random initial direction
+    this.direction = -1;
   }
 
   updatePosition(sprite: Sprite) {
@@ -18,10 +18,21 @@ export default class BallMovement {
 
   reverseVerticalDirection() {
     this.direction = -this.direction;
+    if (this.direction < 0) {
+      this.direction += 2 * Math.PI;
+    }
   }
-
+  
   reverseHorizontalDirection() {
+    // Reverse the horizontal direction
     this.direction = Math.PI - this.direction;
+
+    // Normalize the direction to ensure it stays within [0, 2 * Math.PI]
+    if (this.direction < 0) {
+      this.direction += 2 * Math.PI;
+    } else if (this.direction >= 2 * Math.PI) {
+      this.direction -= 2 * Math.PI;
+    }
   }
 
   getDirection() {

@@ -1,7 +1,7 @@
 import { Sprite, Graphics } from "pixi.js";
 import BallCollision from "./BallCollision";
 import BallMovement from "./BallMovement";
-import App from "../../app/App";
+import Game from "../../app/Game";
 import platformConfig from "../../platform/config";
 import ballConfig from "./config";
 
@@ -9,7 +9,6 @@ export class Ball extends Sprite {
   private isAnimating = false;
   public movement = new BallMovement();
   private ballCollision = new BallCollision(this);
-  private static radius = 7;
 
   constructor() {
     super(Ball.createTexture());
@@ -18,15 +17,15 @@ export class Ball extends Sprite {
 
   private static createTexture() {
     const graphics = new Graphics()
-      .circle(0, 0, this.radius)
+      .circle(0, 0, ballConfig.radius)
       .fill(ballConfig.color);
-    return App.app.renderer.generateTexture(graphics);
+    return Game.app.renderer.generateTexture(graphics);
   }
 
   private setInitialPosition() {
-    const { width, height } = App.app.canvas;
-    this.x = (width - Ball.radius) / 2;
-    this.y = height - platformConfig.height * 2 - Ball.radius;
+    const { width, height } = Game.app.canvas;
+    this.x = (width - ballConfig.radius) / 2;
+    this.y = height - platformConfig.height * 2 - ballConfig.radius - 50;
   }
 
   updatePosition() {

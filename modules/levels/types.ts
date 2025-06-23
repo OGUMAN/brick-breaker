@@ -1,4 +1,6 @@
+import type { IBrick } from "../game/bricks/types";
+
 export interface ILevel {
   id: number;
-  isOpen: boolean;
+  bricks: IBrick[];
 }

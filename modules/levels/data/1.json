@@ -1,0 +1,19 @@
+{
+  "id": 0,
+  "bricks": [
+    {
+      "cells": [{ "x": 4, "y": 8 }],
+      "color": "#FF0000",
+      "break": true,
+      "bonus": "add_life",
+      "id": 4
+    },
+    {
+      "cells": [{ "x": 6, "y": 8 }],
+      "color": "#460095",
+      "break": true,
+      "bonus": "add_ball",
+      "id": 5
+    }
+  ]
+}

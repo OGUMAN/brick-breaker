@@ -1,12 +1,11 @@
 export interface IBonus {
-  name: string;
+  name: BonusName;
   icon: string;
   color: string;
   effect: () => void;
 }
 
 export enum BonusName {
-  ExtraLife = "ExtraLife",
-  SpeedUp = "SpeedUp",
-  SlowDown = "SlowDown",
+  ADD_LIFE = "add_life",
+  ADD_BALL = "add_ball",
 }

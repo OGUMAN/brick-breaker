@@ -1,8 +1,7 @@
 import type { Ticker } from "pixi.js";
-import App from "~/modules/game/app/App";
+import Game from "@/modules/game/app/Game";
 import BallsHandler from "../balls/BallsHandler";
 import Platform from "../platform/Platform";
-import { BricksHandler } from "../level/BricksHandler";
 import { BonusesHandler } from "../bonuses/BonusesHandler";
 
 export default class TickerHandler {
@@ -10,7 +9,7 @@ export default class TickerHandler {
   static delta: number;
 
   public static init() {
-    this.ticker = App.app.ticker;
+    this.ticker = Game.app.ticker;
 
     this.ticker.add((time) => {
       const delta = time.deltaTime;

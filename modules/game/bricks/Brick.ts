@@ -1,6 +1,6 @@
-import { Graphics, Sprite } from "pixi.js";
+import { Bounds, Graphics, Sprite } from "pixi.js";
 import brickConfig from "./brickConfig";
-import App from "../app/App";
+import Game from "../app/Game";
 import type { IBrick } from "./types";
 
 export class Brick extends Sprite {
@@ -32,6 +32,18 @@ export class Brick extends Sprite {
         .fill(this.data.color);
     });
 
-    return App.app.renderer.generateTexture(graphics);
+    return Game.app.renderer.generateTexture(graphics);
+  }
+
+  public getCellsBounds() {
+    return this.data.cells.map(
+      (cell) =>
+        new Bounds(
+          cell.x * brickConfig.cellWidth,
+          cell.y * brickConfig.cellWidth,
+          cell.x * brickConfig.cellWidth + brickConfig.cellWidth,
+          cell.y * brickConfig.cellWidth + brickConfig.cellWidth
+        )
+    );
   }
 }

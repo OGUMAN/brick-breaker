@@ -1,14 +1,14 @@
-import App from "@/modules/game/app/App";
+import Game from "~/modules/game/app/Game";
 import { PlatformMovement } from "./PlatformMovement";
 import { PlatformRenderer } from "./PlatformRenderer";
 import { PlatformInput } from "./PlatformInput";
 
 export default class Platform {
-  static initialize() {
+  static init() {
     PlatformRenderer.init();
 
     PlatformInput.addKeyboardListeners();
-    App.app.stage.addChild(PlatformRenderer.sprite);
+    Game.app.stage.addChild(PlatformRenderer.sprite);
   }
 
   static updatePosition() {

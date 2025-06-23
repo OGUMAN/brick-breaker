@@ -9,6 +9,10 @@ export default defineNuxtConfig({
       path: "~/modules/levels/components",
       prefix: "Levels",
     },
+      {
+      path: "~/modules/game/components",
+      prefix: "Game",
+    },
   ],
   modules: [
     (_options, nuxt) => {
@@ -17,6 +21,7 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
+    "@pinia/nuxt",
   ],
   build: {
     transpile: ["vuetify"],

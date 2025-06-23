@@ -1,15 +1,14 @@
+import Game from "../../app/Game";
 import { Container } from "pixi.js";
 import { bonuses } from "../utils/bonuses";
 import { BonusName, type IBonus } from "../utils/types";
-import App from "../../app/App";
-import { getSpritesCollisions } from "../../helpers/collision";
+import { getBoundsCollision } from "../../helpers/collision/collision";
 import { PlatformRenderer } from "../../platform/PlatformRenderer";
 import { BonusBackground } from "./BonusBackground";
 import { BonusIcon } from "./BonusIcon";
-import type Platform from "../../platform/Platform";
 
 export class Bonus extends Container {
-  private bonusData: IBonus;
+  public bonusData: IBonus;
   private background: BonusBackground;
   private icon: BonusIcon;
   private collected = false;
@@ -22,22 +21,26 @@ export class Bonus extends Container {
 
     this.bonusData = bonus;
 
-    // Create the background and icon, then add them to the container
-    this.background = new BonusBackground(this.bonusData.color);
-    this.icon = new BonusIcon(this.bonusData.icon);
+    this.background = new BonusBackground(this);
+    this.icon = new BonusIcon(this);
 
-    this.addChild(this.background);
-    this.addChild(this.icon);
-
-    this.position.set(Math.random() * (App.app.canvas.width - this.width), 0);
+    this.position.set(Math.random() * (Game.app.canvas.width - this.width), 0);
   }
 
   public updatePosition() {
-    this.y += 2; // Adjust speed as needed
+    if (this.y > Game.app.canvas.height) {
+      this.destroyBonus();
+      return;
+    }
+
+    this.y += 2;
   }
 
   public checkCollision() {
-    const collisionSide = getSpritesCollisions(this, PlatformRenderer.sprite);
+    const collisionSide = getBoundsCollision(
+      this.getBounds(),
+      PlatformRenderer.sprite.getBounds()
+    );
 
     if (collisionSide && !this.collected) {
       this.collected = true;

@@ -1,4 +1,4 @@
-import App from "../app/App";
+import Game from "../app/Game";
 import type { Brick } from "./Brick";
 import { Container } from "pixi.js";
 
@@ -8,7 +8,12 @@ export class BricksHandler {
 
   static init() {
     this.container = new Container();
-    App.getStage().addChild(this.container);
+    Game.getStage().addChild(this.container);
+  }
+
+  static clear() {
+    this.bricks.forEach((brick) => brick.destroy());
+    this.bricks = [];
   }
 
   static addBrick(brick: Brick) {
@@ -21,9 +26,20 @@ export class BricksHandler {
       (b) => b.data.id === brick.data.id
     );
 
-    if (brickIndex !== -1) {
+    if (brickIndex > -1) {
       this.bricks.splice(brickIndex, 1);
+
       this.container.removeChild(brick);
     }
+
+    if (this.isLevelCompleted()) {
+      Game.handleWin();
+    }
+  }
+
+  static isLevelCompleted() {
+    const allBricks = this.bricks.filter((brick) => brick.data.break);
+
+    return allBricks.length === 0;
   }
 }

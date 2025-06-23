@@ -1,41 +1,73 @@
 import type { Ball } from "./Ball";
-import LivesHandler from "../../lifes/LifesHandler";
+import LifesHandler from "../../lifes/LifesHandler";
 import {
-  getCanvasCollisions,
-  getSpritesCollisions,
-} from "../../helpers/collision";
-import App from "../../app/App";
+  getCanvasCollision,
+  getBoundsCollision,
+  CollisionSide,
+} from "../../helpers/collision/collision";
+import Game from "../../app/Game";
 import { PlatformRenderer } from "../../platform/PlatformRenderer";
+import BallsHandler from "../BallsHandler";
 
 export default class BallCollision {
   constructor(private sprite: Ball) {}
 
-  checkCollisions() {
-    this.checkCanvasCollision();
-    this.checkPlatformCollision();
+  checkCollisions(): void {
+    this.handleCanvasCollision();
+    this.handlePlatformCollision();
   }
 
-  private checkCanvasCollision() {
-    const { width, height } = App.getCanvas();
+  private handleCanvasCollision(): void {
+    const { width, height } = Game.getCanvas();
     const { width: spriteWidth, height: spriteHeight, movement } = this.sprite;
-    const { left, right, top, bottom } = getCanvasCollisions(this.sprite);
+    const collisionSide = getCanvasCollision(this.sprite.getBounds());
 
-    if (left || right) {
-      this.sprite.x = left ? 0 : width - spriteWidth;
-      movement.reverseHorizontalDirection();
-    }
-
-    if (top || bottom) {
-      this.sprite.y = top ? 0 : height - spriteHeight;
-      if (bottom) LivesHandler.removeLife();
-      movement.reverseVerticalDirection();
+    switch (collisionSide) {
+      case CollisionSide.LEFT:
+        this.handleLeftCollision(spriteWidth);
+        break;
+      case CollisionSide.RIGHT:
+        this.handleRightCollision(width, spriteWidth);
+        break;
+      case CollisionSide.TOP:
+        this.handleTopCollision();
+        break;
+      case CollisionSide.BOTTOM:
+        this.handleBottomCollision();
+        break;
     }
   }
 
-  private checkPlatformCollision() {
-    if (getSpritesCollisions(this.sprite, PlatformRenderer.sprite) === "top") {
-      const { height: spriteHeight, movement } = this.sprite;
+  private handleLeftCollision(spriteWidth: number): void {
+    this.sprite.x = 0;
+    this.sprite.movement.reverseHorizontalDirection();
+  }
 
+  private handleRightCollision(canvasWidth: number, spriteWidth: number): void {
+    this.sprite.x = canvasWidth - spriteWidth;
+    this.sprite.movement.reverseHorizontalDirection();
+  }
+
+  private handleTopCollision(): void {
+    this.sprite.movement.reverseVerticalDirection();
+  }
+
+  private handleBottomCollision(): void {
+    this.sprite.movement.reverseVerticalDirection();
+    BallsHandler.removeBall(this.sprite);
+    if (BallsHandler.ballsList.length === 0) {
+      LifesHandler.removeLife();
+    }
+  }
+
+  private handlePlatformCollision(): void {
+    if (
+      getBoundsCollision(
+        this.sprite.getBounds(),
+        PlatformRenderer.sprite.getBounds()
+      )
+    ) {
+      const { height: spriteHeight, movement } = this.sprite;
       this.sprite.y = PlatformRenderer.sprite.y - spriteHeight;
       movement.reverseVerticalDirection();
     }
